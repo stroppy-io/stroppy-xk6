@@ -1,4 +1,4 @@
-package stroppy_xk6
+package xk6
 
 import (
 	"errors"

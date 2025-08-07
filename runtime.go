@@ -1,4 +1,4 @@
-package stroppy_xk6
+package xk6
 
 import (
 	"go.k6.io/k6/js/modules"
