@@ -21,12 +21,12 @@ help: # Show help in Makefile
 .PHONY: .install-k6
 .install-k6: # Install k6
 	$(info Installing xk6...)
+	mkdir -p $(LOCAL_BIN)
 	GOBIN=$(LOCAL_BIN) go install go.k6.io/xk6@latest
 
 .PHONY: .bin-deps
 .bin-deps: .install-linter .install-k6 # Install binary dependencies in ./bin
 	$(info Installing binary dependencies...)
-
 
 GOPROXY:=https://goproxy.io,direct
 .PHONY: .app-deps
