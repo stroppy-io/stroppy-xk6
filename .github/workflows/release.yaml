@@ -54,17 +54,11 @@ jobs:
           go-version: ${{ matrix.go }}
           cache: true
 
-      - name: Prepare LOCAL_BIN in PATH
-        shell: bash
-        run: |
-          mkdir -p "${LOCAL_BIN}"
-          echo "${LOCAL_BIN}" >> $GITHUB_PATH
-
       - name: Install xk6 (k6 builder)
         shell: bash
         run: |
           echo "Installing xk6 into ${LOCAL_BIN}..."
-          GOBIN="${LOCAL_BIN}" go install go.k6.io/xk6@latest
+          go install go.k6.io/xk6@latest
           xk6 --version
 
       - name: Compute names
