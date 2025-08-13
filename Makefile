@@ -28,10 +28,14 @@ help: # Show help in Makefile
 .bin-deps: .install-linter .install-k6 # Install binary dependencies in ./bin
 	$(info Installing binary dependencies...)
 
-GOPROXY:=https://goproxy.io,direct
 .PHONY: .app-deps
 .app-deps: # Install application dependencies in ./bin
 	GOPROXY=$(GOPROXY) go mod tidy
+
+.PHONY: update-core
+update-core: # Update core by latest version
+	go get github.com/username/repo@none
+	go get -u github.com/stroppy-io/stroppy-core@latest
 
 .PHONY: linter
 linter: # Start linter
@@ -47,11 +51,11 @@ linter_fix: # Start linter with possible fixes
 tests: # Run tests with coverage
 	go test -race ./... -coverprofile=coverage.out
 
-K6_OUT_FILE=$(CURDIR)/build/k6
+K6_OUT_FILE=$(CURDIR)/build/stroppy-k6
 .PHONY: build
 build: # Build k6 module
 	mkdir -p $(CURDIR)/build
-	XK6_RACE_DETECTOR=1 $(LOCAL_BIN)/xk6 build --verbose --with github.com/stroppy-io/stroppy-xk6=. --output $(K6_OUT_FILE)
+	XK6_RACE_DETECTOR=0 $(LOCAL_BIN)/xk6 build --verbose --with github.com/stroppy-io/stroppy-xk6=. --output $(K6_OUT_FILE)
 
 branch=main
 .PHONY: revision

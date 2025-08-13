@@ -6,7 +6,7 @@ require (
 	github.com/Sytten/logrus-zap-hook v0.1.0
 	github.com/grafana/sobek v0.0.0-20250723111835-dd8a13f0d439
 	github.com/sirupsen/logrus v1.9.3
-	github.com/stroppy-io/stroppy-core v0.0.1
+	github.com/stroppy-io/stroppy-core v0.0.2
 	go.k6.io/k6 v1.1.0
 	go.uber.org/zap v1.27.0
 	google.golang.org/protobuf v1.36.7

@@ -2,15 +2,19 @@ name: CI
 
 on:
   push:
-    tags:
-      - '*'
-
+    branches:
+      - '**'   # all branches
+    tags-ignore:
+      - '*'    # ignore all tags
+  pull_request:
+    branches:
+      - '**'   # all branches
 jobs:
   golang-ci:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Go
         uses: actions/setup-go@v5
@@ -31,7 +35,7 @@ jobs:
     needs: [ golang-ci ]
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Download dependencies
         run: go mod download
@@ -47,27 +51,3 @@ jobs:
         with:
           name: k6-artifacts
           path: build
-
-  release:
-    runs-on: ubuntu-latest
-    needs: [ k6-build ]
-    steps:
-      - name: Download docs artifacts
-        uses: actions/download-artifact@v5
-        with:
-          name: k6-artifacts
-          path: build
-
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ github.ref_name }}
-          name: Release ${{ github.ref_name }}
-          make_latest: true
-          draft: false
-          prerelease: false
-          generate_release_notes: true
-          body: |
-            Release ${{ github.ref_name }} contains k6 binary with embeded stroppy-xk6 module
-          files: |
-            build/**

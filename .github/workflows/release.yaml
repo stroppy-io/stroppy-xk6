@@ -1,0 +1,148 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  # Имя выходного бинаря k6
+  K6_BIN_NAME: ${{ github.event.repository.name }}
+
+jobs:
+  golang-ci:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24.3'
+
+      - name: Install linter dependencies
+        run: make .install-linter
+
+      - name: Run linter
+        run: make linter
+
+      - name: Run tests
+        run: make tests
+
+  build:
+    needs: golang-ci
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        go: ["1.24.3"]
+        os: [linux, darwin]
+        arch: [amd64, arm64]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.go }}
+          cache: true
+
+      - name: Prepare LOCAL_BIN in PATH
+        shell: bash
+        run: |
+          mkdir -p "${LOCAL_BIN}"
+          echo "${LOCAL_BIN}" >> $GITHUB_PATH
+
+      - name: Install xk6 (k6 builder)
+        shell: bash
+        run: |
+          echo "Installing xk6 into ${LOCAL_BIN}..."
+          GOBIN="${LOCAL_BIN}" go install go.k6.io/xk6@latest
+          xk6 --version
+
+      - name: Compute names
+        id: names
+        shell: bash
+        run: |
+          BIN="${K6_BIN_NAME}"
+          PKG="${BIN}_${{ matrix.os }}_${{ matrix.arch }}"
+          OUTDIR="dist/${PKG}"
+          ARCHIVE="${PKG}.tar.gz"
+          echo "bin=${BIN}" >> $GITHUB_OUTPUT
+          echo "pkg=${PKG}" >> $GITHUB_OUTPUT
+          echo "outdir=${OUTDIR}" >> $GITHUB_OUTPUT
+          echo "archive=${ARCHIVE}" >> $GITHUB_OUTPUT
+
+      - name: Build k6 via xk6
+        env:
+          # Кросс-компиляция
+          GOOS: ${{ matrix.os }}
+          GOARCH: ${{ matrix.arch }}
+          # Как в Makefile:
+          XK6_RACE_DETECTOR: "0"
+          CGO_ENABLED: "0"
+        shell: bash
+        run: |
+          mkdir -p "${{ steps.names.outputs.outdir }}"
+          xk6 build --verbose \
+            --with github.com/stroppy-io/stroppy-xk6=. \
+            --output "${{ steps.names.outputs.outdir }}/${{ steps.names.outputs.bin }}"
+
+      #  [ -f ../README.md ] && EXTRAS+=("../README.md")
+      #  [ -f ../LICENSE ] && EXTRAS+=("../LICENSE")
+      - name: Package (.tar.gz)
+        shell: bash
+        run: |
+          cd dist
+          PKG="${{ steps.names.outputs.pkg }}"
+          OUTDIR="${PKG}"
+          EXTRAS=()
+          tar -C "${OUTDIR}" -czf "${{ steps.names.outputs.archive }}" . ${EXTRAS[@]+"${EXTRAS[@]}"}
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.names.outputs.pkg }}
+          path: dist/${{ steps.names.outputs.archive }}
+          if-no-files-found: error
+          retention-days: 7
+
+  release:
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v5
+        with:
+          path: dist
+
+      - name: Gather files
+        id: gather
+        shell: bash
+        run: |
+          shopt -s globstar nullglob
+          files=(dist/**/*.tar.gz)
+          printf '%s\n' "${files[@]}" > files.txt
+          echo "files<<EOF" >> $GITHUB_OUTPUT
+          printf '%s\n' "${files[@]}" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          echo "count=${#files[@]}" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release & Upload Assets
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          files: ${{ steps.gather.outputs.files }}
+          make_latest: true
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
