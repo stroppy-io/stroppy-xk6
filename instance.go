@@ -53,11 +53,11 @@ func (x *Instance) Setup(runContextBytes string) error {
 
 	x.logger.Debug(
 		"Setup",
-		zap.Uint64("seed", runContext.GetConfig().GetSeed()),
+		zap.Uint64("seed", runContext.GetGlobalConfig().GetRun().GetSeed()),
 	)
 	// TODO: think about cancel
 	drv, _, err := driver.ConnectToPlugin(
-		runContext.GetConfig(),
+		runContext.GetGlobalConfig().GetRun(),
 		x.logger,
 	)
 	if err != nil {
@@ -80,40 +80,40 @@ func (x *Instance) Setup(runContextBytes string) error {
 
 //goland:noinspection t
 func (x *Instance) GenerateQueue() (string, error) {
-	stepQueries := make([]*stroppy.DriverQuery, 0)
+	stepTransactions := make([]*stroppy.DriverTransaction, 0)
 
-	for _, queryDesc := range runPtr.runContext.GetStep().GetQueries() {
-		queries, err := runPtr.driver.BuildQueries(
+	for _, unitDescr := range runPtr.runContext.GetStep().GetUnits() {
+		queries, err := runPtr.driver.BuildTransactionsFromUnit(
 			x.vu.Context(),
-			&stroppy.BuildQueriesContext{
+			&stroppy.UnitBuildContext{
 				Context: runPtr.runContext,
-				Query:   queryDesc,
+				Unit:    unitDescr,
 			},
 		)
 		if err != nil {
 			return "", err
 		}
 
-		stepQueries = append(stepQueries, queries.GetQueries()...)
+		stepTransactions = append(stepTransactions, queries.GetTransactions()...)
 	}
 
-	return MarshalSerialized(&stroppy.DriverQueriesList{Queries: stepQueries})
+	return MarshalSerialized(&stroppy.DriverTransactionList{Transactions: stepTransactions})
 }
 
 func (x *Instance) RunQuery(queryData string) error {
-	query, err := Serialized[*stroppy.DriverQuery](queryData).Unmarshal()
+	transaction, err := Serialized[*stroppy.DriverTransaction](queryData).Unmarshal()
 	if err != nil {
 		return err
 	}
 
 	runPtr.logger.Debug(
 		"RunQuery",
-		zap.Any("query", query),
+		zap.Any("transaction", transaction),
 	)
 
-	return runPtr.driver.RunQuery(
+	return runPtr.driver.RunTransaction(
 		x.vu.Context(),
-		query,
+		transaction,
 	)
 }
 
