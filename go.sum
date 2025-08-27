@@ -115,8 +115,8 @@ github.com/stretchr/testify v1.7.0/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/
 github.com/stretchr/testify v1.7.2/go.mod h1:R6va5+xMeoiuVRoj+gSkQ7d3FALtqAAGI1FQKckRals=
 github.com/stretchr/testify v1.10.0 h1:Xv5erBjTwe/5IxqUQTdXv5kgmIvbHo3QQyRwhJsOfJA=
 github.com/stretchr/testify v1.10.0/go.mod h1:r2ic/lqez/lEtzL7wO/rwa5dbSLXVDPFyf8C91i36aY=
-github.com/stroppy-io/stroppy-core v0.0.6 h1:v/7vCYXseeOBQsKP8e7hXtBUTYL3bnNSixvsK/RDkBw=
-github.com/stroppy-io/stroppy-core v0.0.6/go.mod h1:Tm37Vj2Qul9muzTZPj9jetdwzoyX/fLeNjaOUKegYWg=
+github.com/stroppy-io/stroppy-core v0.0.7 h1:m8/+JMQkN8/Ez5V/mwGGbKLxAYC23BMobeX9zI8iaUM=
+github.com/stroppy-io/stroppy-core v0.0.7/go.mod h1:Tm37Vj2Qul9muzTZPj9jetdwzoyX/fLeNjaOUKegYWg=
 github.com/yuin/goldmark v1.2.1/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 go.k6.io/k6 v1.1.0 h1:kKAJTSmaEaaTGbw9rB2K49So0ul0kf05loZGXsI4Dxo=
 go.k6.io/k6 v1.1.0/go.mod h1:C68dyEQUUZ1MSCPpFdQcjdtydAgNTOASNKhkDF7fiHg=
