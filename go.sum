@@ -123,6 +123,8 @@ github.com/stroppy-io/stroppy-core v0.0.3 h1:vwFhPka4+3AZIy5r1c0IwobLtPFcNr7d2bb
 github.com/stroppy-io/stroppy-core v0.0.3/go.mod h1:Tm37Vj2Qul9muzTZPj9jetdwzoyX/fLeNjaOUKegYWg=
 github.com/stroppy-io/stroppy-core v0.0.4 h1:5JiMtwyTx239mrxRGz8t3jaM+0Toj3NqiybzlSyGdEU=
 github.com/stroppy-io/stroppy-core v0.0.4/go.mod h1:Tm37Vj2Qul9muzTZPj9jetdwzoyX/fLeNjaOUKegYWg=
+github.com/stroppy-io/stroppy-core v0.0.5 h1:IsqyqCEdhSx/Th4z2vaTzqXYyLE/EpJUCdadqBRFcEI=
+github.com/stroppy-io/stroppy-core v0.0.5/go.mod h1:Tm37Vj2Qul9muzTZPj9jetdwzoyX/fLeNjaOUKegYWg=
 github.com/yuin/goldmark v1.2.1/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 go.k6.io/k6 v1.1.0 h1:kKAJTSmaEaaTGbw9rB2K49So0ul0kf05loZGXsI4Dxo=
 go.k6.io/k6 v1.1.0/go.mod h1:C68dyEQUUZ1MSCPpFdQcjdtydAgNTOASNKhkDF7fiHg=
